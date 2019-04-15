@@ -1,0 +1,84 @@
+################################################################################
+# Base image
+################################################################################
+
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian as base
+
+ENV INITSYSTEM=on
+ENV DEBIAN_FRONTEND=noninteractive
+
+################################################################################
+# Rust image
+################################################################################
+
+FROM base as rust
+
+# Install build tools
+RUN install_packages build-essential curl file
+
+ENV PATH=/root/.cargo/bin:$PATH
+
+# Install rustup downloading the version specified by the standard rust-toolchain file
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+################################################################################
+# Dependencies
+################################################################################
+
+FROM rust as dependencies
+
+WORKDIR /build
+
+# Create new fake project ($USER is needed by `cargo new`)
+RUN USER=root cargo new app
+
+WORKDIR /build/app
+
+# Copy real app dependencies
+COPY Cargo.* ./
+# Copy the file specifying the Rust version to use
+
+# Build fake project with real dependencies
+RUN cargo build --release
+
+# Remove the fake app build artifacts
+RUN rm -rf target/release/fin* target/release/deps/fin-*
+
+################################################################################
+# Builder
+################################################################################
+
+FROM rust as builder
+
+# We do not want to download deps, update registry, ... again
+COPY --from=dependencies /root/.cargo /root/.cargo
+
+WORKDIR /build/app
+
+# Copy everything, not just source code
+COPY . .
+
+# Update already built deps from dependencies image
+COPY --from=dependencies /build/app/target target
+
+# Build real app
+RUN cargo build --release
+
+RUN strip target/release/fin
+
+################################################################################
+# Final image
+################################################################################
+
+FROM base
+
+WORKDIR /app
+
+# Copy binary from builder image
+COPY --from=builder /build/app/target/release/fin .
+
+# Copy other folders required by the application. Example:
+# COPY --from=builder /build/app/assets assets
+
+# Launch application
+CMD ["sleep", "infinity"]

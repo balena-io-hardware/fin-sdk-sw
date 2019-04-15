@@ -6,6 +6,9 @@ description = "balenaFin SDK"
 license = "Apache-2.0"
 edition = "2018"
 
+[dependencies]
+nix = "0.13"
+
 [dependencies.clap]
 version = "2.33"
 default-features = false
