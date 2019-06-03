@@ -1,6 +1,11 @@
-use std::ffi::CString;
+extern crate glib_sys;
+extern crate gobject_sys;
 
-use libc::c_char;
+#[macro_use]
+extern crate glib;
+
+use std::ffi::CString;
+use std::os::raw::c_char;
 
 use glib::prelude::*;
 use glib::subclass;
@@ -8,7 +13,7 @@ use glib::subclass::prelude::*;
 use glib::translate::*;
 use glib::ToValue;
 
-use crate::version::get_fin_version;
+use fin_base::get_fin_version;
 
 static PROPERTIES: [subclass::Property; 1] = [subclass::Property("version", |version| {
     glib::ParamSpec::string(
@@ -43,7 +48,7 @@ impl ObjectSubclass for RustClient {
 
     fn new() -> Self {
         Self {
-            version:CString::new(&get_fin_version() as &str).unwrap(),
+            version: CString::new(&get_fin_version() as &str).unwrap(),
         }
     }
 }
@@ -57,7 +62,7 @@ impl ObjectImpl for RustClient {
         match *prop {
             subclass::Property("version", ..) => {
                 Ok(self.version.clone().into_string().unwrap().to_value())
-            },
+            }
             _ => unimplemented!(),
         }
     }
@@ -68,7 +73,7 @@ impl ObjectImpl for RustClient {
 }
 
 impl RustClient {
-    fn get_version(&self) -> *const libc::c_char {
+    fn get_version(&self) -> *const c_char {
         self.version.as_ptr()
     }
 }
@@ -96,13 +101,10 @@ fn into_rust_client<'a>(client: *const FinClient) -> &'a RustClient {
 
 #[no_mangle]
 unsafe extern "C" fn fin_client_new() -> *mut FinClient {
-    let obj = glib::Object::new(
-        RustClient::get_type(),
-        &[],
-    )
-    .unwrap()
-    .downcast::<ClientWrapper>()
-    .unwrap();
+    let obj = glib::Object::new(RustClient::get_type(), &[])
+        .unwrap()
+        .downcast::<ClientWrapper>()
+        .unwrap();
     obj.to_glib_full()
 }
 

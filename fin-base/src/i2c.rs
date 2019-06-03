@@ -19,4 +19,3 @@ pub fn probe_i2c_pca9633() -> Option<()> {
 fn open_dev_i2c_3() -> Option<File> {
     OpenOptions::new().read(true).open("/dev/i2c-3").ok()
 }
-

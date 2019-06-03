@@ -1,0 +1,17 @@
+[package]
+name = "fin-sdk"
+version = "0.1.0"
+authors = ["Zahari Petkov <zahari@balena.io>"]
+description = "balenaFin SDK"
+license = "Apache-2.0"
+edition = "2018"
+
+[dependencies]
+fin-base = { version = "*", path = "../fin-base" }
+glib-sys = { git = "https://github.com/gtk-rs/sys" }
+gobject-sys = { git = "https://github.com/gtk-rs/sys" }
+glib = { git = "https://github.com/gtk-rs/glib", features = ["subclassing"] }
+
+[lib]
+crate-type = ["cdylib"]
+name = "fin"
