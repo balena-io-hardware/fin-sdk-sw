@@ -1,1 +1,4 @@
 /target/
+*.gir
+*.typelib
+Cargo.lock

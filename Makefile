@@ -3,12 +3,13 @@ HEADERS = \
 	include/fin/client.h
 
 RUST_SOURCES = \
-	src/command.rs \
-	src/ethtool.rs \
-	src/gi.rs \
-	src/i2c.rs \
-	src/lib.rs \
-	src/version.rs
+	fin-cli/src/command.rs \
+        fin-cli/src/main.rs \
+	fin-base/src/ethtool.rs \
+	fin-base/src/i2c.rs \
+	fin-base/src/lib.rs \
+	fin-base/src/version.rs \
+	fin-sdk/src/lib.rs
 
 all: Fin-0.1.gir Fin-0.1.typelib
 

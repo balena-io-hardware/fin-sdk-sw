@@ -1,0 +1,11 @@
+[package]
+name = "fin-base"
+version = "0.1.0"
+authors = ["Zahari Petkov <zahari@balena.io>"]
+description = "balenaFin base library"
+license = "Apache-2.0"
+edition = "2018"
+
+[dependencies]
+nix = "0.14"
+libc = "0.2"

@@ -1,0 +1,15 @@
+[package]
+name = "fin-cli"
+version = "0.1.0"
+authors = ["Zahari Petkov <zahari@balena.io>"]
+description = "balenaFin CLI"
+license = "Apache-2.0"
+edition = "2018"
+
+[[bin]]
+name = "fin"
+path = "src/main.rs"
+
+[dependencies]
+fin-base = { version = "*", path = "../fin-base" }
+clap = { version = "2.33", default-features = false }

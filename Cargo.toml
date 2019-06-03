@@ -1,24 +1,12 @@
-[package]
-name = "fin"
-version = "0.1.0"
-authors = ["Zahari Petkov <zahari@balena.io>"]
-description = "balenaFin SDK"
-license = "Apache-2.0"
-edition = "2018"
-
-[dependencies]
-nix = "0.14"
-libc = "0.2"
-glib-sys = { git = "https://github.com/gtk-rs/sys" }
-gobject-sys = { git = "https://github.com/gtk-rs/sys" }
-glib = { git = "https://github.com/gtk-rs/glib", features = ["subclassing"] }
-
-[lib]
-crate-type = ["cdylib"]
+[workspace]
+members = [
+    "fin-cli",
+    "fin-sdk",
+    "fin-base",
+]
 
 [profile.release]
 opt-level = 'z'
 lto = true
 codegen-units = 1
 panic = 'abort'
-
