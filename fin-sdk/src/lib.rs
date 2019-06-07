@@ -13,7 +13,7 @@ use glib::subclass::prelude::*;
 use glib::translate::*;
 use glib::ToValue;
 
-use fin_base::get_fin_version;
+use fin_lib::get_fin_version;
 
 static PROPERTIES: [subclass::Property; 1] = [subclass::Property("version", |version| {
     glib::ParamSpec::string(

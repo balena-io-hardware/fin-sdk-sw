@@ -11,5 +11,5 @@ name = "fin"
 path = "src/main.rs"
 
 [dependencies]
-fin-base = { version = "*", path = "../fin-base" }
+fin-lib = { version = "*", path = "../fin-lib" }
 clap = { version = "2.33", default-features = false }

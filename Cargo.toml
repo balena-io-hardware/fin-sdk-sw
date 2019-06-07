@@ -2,7 +2,7 @@
 members = [
     "fin-cli",
     "fin-sdk",
-    "fin-base",
+    "fin-lib",
 ]
 
 [profile.release]

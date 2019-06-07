@@ -1,2 +1,1 @@
-# fin-rs
-WIP: Fin Rust CLI
+# balenaFin SDK

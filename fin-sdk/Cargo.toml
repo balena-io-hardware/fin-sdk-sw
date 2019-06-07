@@ -7,7 +7,7 @@ license = "Apache-2.0"
 edition = "2018"
 
 [dependencies]
-fin-base = { version = "*", path = "../fin-base" }
+fin-lib = { version = "*", path = "../fin-lib" }
 glib-sys = { git = "https://github.com/gtk-rs/sys" }
 gobject-sys = { git = "https://github.com/gtk-rs/sys" }
 glib = { git = "https://github.com/gtk-rs/glib", features = ["subclassing"] }

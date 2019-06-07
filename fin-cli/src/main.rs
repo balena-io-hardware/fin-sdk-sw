@@ -4,7 +4,7 @@ mod command;
 
 use command::{get_command, Command};
 
-use fin_base::get_fin_version;
+use fin_lib::get_fin_version;
 
 fn main() {
     match get_command() {

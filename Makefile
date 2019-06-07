@@ -5,10 +5,10 @@ HEADERS = \
 RUST_SOURCES = \
 	fin-cli/src/command.rs \
         fin-cli/src/main.rs \
-	fin-base/src/ethtool.rs \
-	fin-base/src/i2c.rs \
-	fin-base/src/lib.rs \
-	fin-base/src/version.rs \
+	fin-lib/src/ethtool.rs \
+	fin-lib/src/i2c.rs \
+	fin-lib/src/lib.rs \
+	fin-lib/src/version.rs \
 	fin-sdk/src/lib.rs
 
 all: Fin-0.1.gir Fin-0.1.typelib
