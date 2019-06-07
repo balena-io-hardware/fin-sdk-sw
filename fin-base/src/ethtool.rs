@@ -9,13 +9,27 @@ const SYSFS_ETH_NET: &str = "/sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1
 
 const SIOCETHTOOL: u16 = 0x8946;
 
-const FIN_EEPROM_OFFSET: u32 = 0;
+const FIN_EEPROM_OFFSET: u32 = 0x27;
+const FIN_EEPROM_LEN: usize = 21;
 
 const ETHTOOL_GEEPROM: u32 = 0x0000_000b;
 
 type IfName = [u8; libc::IFNAMSIZ];
 
+type EEPROMData = [u8; FIN_EEPROM_LEN];
+
 ioctl_readwrite_bad!(ioctl_ethtool, SIOCETHTOOL, ifreq);
+
+#[derive(Clone, Debug)]
+struct FinEEPROM {
+    schema: u8,
+    major: u8,
+    minor: u8,
+    serial: String,
+    week: u8,
+    year: u8,
+    lot: String,
+}
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -73,16 +87,6 @@ impl ifreq {
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
-struct EEPROMData {
-    revision: u8,
-    serial: [u8; 3],
-    week: u8,
-    year: [u8; 2],
-    lot_id: [u8; 2],
-}
-
-#[derive(Copy, Clone, Debug)]
-#[repr(C)]
 struct fin_ethtool_eeprom {
     cmd: u32,
     magic: u32,
@@ -101,7 +105,7 @@ pub fn get_eeprom_version() -> Option<String> {
     let ctl_fd = create_control_socket()?;
     let interface = get_builtin_eth_interface()?;
     let data = read_eeprom_data(&ctl_fd, &interface)?;
-    Some(version_from_eeprom_revision(&data))
+    version_from_eeprom_data(&data)
 }
 
 pub fn get_builtin_eth_interface() -> Option<String> {
@@ -140,10 +144,50 @@ fn read_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str) -> Option<EEPROMData> 
     Some(ereq.data)
 }
 
-fn version_from_eeprom_revision(data: &EEPROMData) -> String {
-    if data.revision == 255 {
-        "1.1".to_string()
-    } else {
-        "1.0".to_string()
+fn version_from_eeprom_data(data: &EEPROMData) -> Option<String> {
+    let data = parse_eeprom_data(data)?;
+    Some(format!("{}.{}", data.major, data.minor))
+}
+
+fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
+    let data = String::from_utf8(data.to_vec()).ok()?;
+
+    let schema: u8 = data[0..1].parse().ok()?;
+    if schema != 1 {
+        return None;
     }
+
+    let major: u8 = data[1..2].parse().ok()?;
+    if major < 1 {
+        return None;
+    }
+
+    let minor: u8 = data[2..3].parse().ok()?;
+
+    let serial: String = data[3..8].to_string();
+
+    let week: u8 = data[8..10].parse().ok()?;
+    if week < 1 || week > 52 {
+        return None;
+    }
+
+    let year: u8 = data[10..12].parse().ok()?;
+    if year < 17 {
+        return None;
+    }
+
+    let lot: String = data[12..21].to_string();
+    if lot.chars().nth(4)? != '-' {
+        return None;
+    }
+
+    Some(FinEEPROM {
+        schema,
+        major,
+        minor,
+        serial,
+        week,
+        year,
+        lot,
+    })
 }
