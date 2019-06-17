@@ -1,7 +1,8 @@
-use clap::{App, AppSettings, SubCommand};
+use clap::{App, AppSettings, Arg, SubCommand};
 
 pub enum Command {
     Revision,
+    Eeprom(Option<String>),
 }
 
 pub fn get_command() -> Command {
@@ -11,10 +12,24 @@ pub fn get_command() -> Command {
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(SubCommand::with_name("revision").about("Prints balenaFin hardware revision"))
+        .subcommand(
+            SubCommand::with_name("eeprom")
+                .about("Prints balenaFin raw EEPROM data")
+                .arg(
+                    Arg::with_name("set")
+                        .long("set")
+                        .help("Sets balenaFin raw EEPROM data")
+                        .takes_value(true)
+                        .hidden(true),
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
         ("revision", _) => Command::Revision,
+        ("eeprom", Some(eeprom_matches)) => {
+            Command::Eeprom(eeprom_matches.value_of("set").map(String::from))
+        }
         _ => unreachable!(),
     }
 }

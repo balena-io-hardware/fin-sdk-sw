@@ -9,5 +9,6 @@ use fin_lib::get_revision;
 fn main() {
     match get_command() {
         Command::Revision => println!("{}", get_revision()),
+        Command::Eeprom(data) => println!("EEPROM CMD: {:?}", data),
     }
 }
