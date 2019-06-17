@@ -145,7 +145,7 @@ fn read_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str) -> Option<EEPROMData> 
 
 fn revision_from_eeprom_data(data: &EEPROMData) -> Option<String> {
     let data = parse_eeprom_data(data)?;
-    Some(format!("{}", data.revision))
+    Some(data.revision.to_string())
 }
 
 fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
