@@ -5,6 +5,6 @@ extern crate libc;
 
 mod ethtool;
 mod i2c;
-mod version;
+mod eeprom;
 
-pub use version::get_fin_version;
+pub use eeprom::get_revision;

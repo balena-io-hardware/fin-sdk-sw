@@ -8,7 +8,7 @@ from gi.repository import Fin
 
 fin = Fin.Client.new()
 
-print("Version (props):", fin.props.version)
+print("Revision (props):", fin.props.revision)
 
-print("Version (method):", fin.get_version())
+print("Revision (method):", fin.get_revision())
 

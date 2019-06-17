@@ -4,10 +4,10 @@ mod command;
 
 use command::{get_command, Command};
 
-use fin_lib::get_fin_version;
+use fin_lib::get_revision;
 
 fn main() {
     match get_command() {
-        Command::Version => println!("{}", get_fin_version()),
+        Command::Revision => println!("{}", get_revision()),
     }
 }

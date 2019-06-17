@@ -8,7 +8,7 @@ RUST_SOURCES = \
 	fin-lib/src/ethtool.rs \
 	fin-lib/src/i2c.rs \
 	fin-lib/src/lib.rs \
-	fin-lib/src/version.rs \
+	fin-lib/src/eeprom.rs \
 	fin-sdk/src/lib.rs
 
 all: Fin-0.1.gir Fin-0.1.typelib
@@ -34,8 +34,8 @@ clean:
 	cargo clean
 
 py: Fin-0.1.typelib
-	GI_TYPELIB_PATH=$(PWD) LD_LIBRARY_PATH=$(PWD)/target/debug python3 version.py
+	GI_TYPELIB_PATH=$(PWD) LD_LIBRARY_PATH=$(PWD)/target/debug python3 revision.py
 
 js: Fin-0.1.typelib
-	GI_TYPELIB_PATH=$(PWD) LD_LIBRARY_PATH=$(PWD)/target/debug node version.js
+	GI_TYPELIB_PATH=$(PWD) LD_LIBRARY_PATH=$(PWD)/target/debug node revision.js
 

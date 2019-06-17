@@ -13,20 +13,20 @@ use glib::subclass::prelude::*;
 use glib::translate::*;
 use glib::ToValue;
 
-use fin_lib::get_fin_version;
+use fin_lib::get_revision;
 
-static PROPERTIES: [subclass::Property; 1] = [subclass::Property("version", |version| {
+static PROPERTIES: [subclass::Property; 1] = [subclass::Property("revision", |revision| {
     glib::ParamSpec::string(
-        version,
-        "Version",
-        "Version",
+        revision,
+        "Revision",
+        "Revision",
         None,
         glib::ParamFlags::READABLE,
     )
 })];
 
 pub struct RustClient {
-    version: CString,
+    revision: CString,
 }
 
 type FinClientInstance = subclass::simple::InstanceStruct<RustClient>;
@@ -48,7 +48,7 @@ impl ObjectSubclass for RustClient {
 
     fn new() -> Self {
         Self {
-            version: CString::new(&get_fin_version() as &str).unwrap(),
+            revision: CString::new(&get_revision() as &str).unwrap(),
         }
     }
 }
@@ -60,8 +60,8 @@ impl ObjectImpl for RustClient {
         let prop = &PROPERTIES[id];
 
         match *prop {
-            subclass::Property("version", ..) => {
-                Ok(self.version.clone().into_string().unwrap().to_value())
+            subclass::Property("revision", ..) => {
+                Ok(self.revision.clone().into_string().unwrap().to_value())
             }
             _ => unimplemented!(),
         }
@@ -73,8 +73,8 @@ impl ObjectImpl for RustClient {
 }
 
 impl RustClient {
-    fn get_version(&self) -> *const c_char {
-        self.version.as_ptr()
+    fn get_revision(&self) -> *const c_char {
+        self.revision.as_ptr()
     }
 }
 
@@ -114,6 +114,6 @@ unsafe extern "C" fn fin_client_get_type() -> glib_sys::GType {
 }
 
 #[no_mangle]
-unsafe extern "C" fn fin_client_get_version(this: *const FinClient) -> *const c_char {
-    into_rust_client(this).get_version()
+unsafe extern "C" fn fin_client_get_revision(this: *const FinClient) -> *const c_char {
+    into_rust_client(this).get_revision()
 }

@@ -1,7 +1,7 @@
 use clap::{App, AppSettings, SubCommand};
 
 pub enum Command {
-    Version,
+    Revision,
 }
 
 pub fn get_command() -> Command {
@@ -10,11 +10,11 @@ pub fn get_command() -> Command {
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .setting(AppSettings::SubcommandRequiredElseHelp)
-        .subcommand(SubCommand::with_name("version").about("Prints balenaFin hardware version"))
+        .subcommand(SubCommand::with_name("revision").about("Prints balenaFin hardware revision"))
         .get_matches();
 
     match matches.subcommand() {
-        ("version", _) => Command::Version,
+        ("revision", _) => Command::Revision,
         _ => unreachable!(),
     }
 }

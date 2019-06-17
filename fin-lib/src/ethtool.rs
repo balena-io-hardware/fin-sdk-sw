@@ -23,8 +23,7 @@ ioctl_readwrite_bad!(ioctl_ethtool, SIOCETHTOOL, ifreq);
 #[derive(Clone, Debug)]
 struct FinEEPROM {
     schema: u8,
-    major: u8,
-    minor: u8,
+    revision: String,
     serial: String,
     week: u8,
     year: u8,
@@ -101,11 +100,11 @@ impl Default for fin_ethtool_eeprom {
     }
 }
 
-pub fn get_eeprom_version() -> Option<String> {
+pub fn get_eeprom_revision() -> Option<String> {
     let ctl_fd = create_control_socket()?;
     let interface = get_builtin_eth_interface()?;
     let data = read_eeprom_data(&ctl_fd, &interface)?;
-    version_from_eeprom_data(&data)
+    revision_from_eeprom_data(&data)
 }
 
 pub fn get_builtin_eth_interface() -> Option<String> {
@@ -144,9 +143,9 @@ fn read_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str) -> Option<EEPROMData> 
     Some(ereq.data)
 }
 
-fn version_from_eeprom_data(data: &EEPROMData) -> Option<String> {
+fn revision_from_eeprom_data(data: &EEPROMData) -> Option<String> {
     let data = parse_eeprom_data(data)?;
-    Some(format!("{}.{}", data.major, data.minor))
+    Some(format!("{}", data.revision))
 }
 
 fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
@@ -157,12 +156,12 @@ fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
         return None;
     }
 
-    let major: u8 = data[1..2].parse().ok()?;
-    if major < 1 {
+    let revision_u16: u16 = data[1..3].parse().ok()?;
+    if revision_u16 < 10 {
         return None;
     }
 
-    let minor: u8 = data[2..3].parse().ok()?;
+    let revision: String = data[1..3].to_string();
 
     let serial: String = data[3..8].to_string();
 
@@ -183,8 +182,7 @@ fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
 
     Some(FinEEPROM {
         schema,
-        major,
-        minor,
+        revision,
         serial,
         week,
         year,

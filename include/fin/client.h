@@ -27,7 +27,7 @@ GType fin_client_get_type(void);
 
 FinClient *fin_client_new();
 
-const gchar *fin_client_get_version(FinClient *client);
+const gchar *fin_client_get_revision(FinClient *client);
 
 G_END_DECLS
 
