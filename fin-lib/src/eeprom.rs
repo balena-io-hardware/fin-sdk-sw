@@ -1,4 +1,4 @@
-use crate::ethtool::get_eeprom_revision;
+use crate::ethtool::{get_eeprom_revision, get_raw_eeprom, set_raw_eeprom};
 
 use crate::i2c::probe_i2c_pca9633;
 
@@ -12,4 +12,16 @@ pub fn get_revision() -> String {
     }
 
     revision
+}
+
+pub fn set_eeprom(eeprom: &str) {
+    set_raw_eeprom(eeprom);
+}
+
+pub fn get_eeprom() -> String {
+    if let Some(eeprom) = get_raw_eeprom() {
+        eeprom
+    } else {
+        "".to_string()
+    }
 }

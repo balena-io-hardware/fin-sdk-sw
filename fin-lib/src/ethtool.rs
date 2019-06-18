@@ -9,10 +9,12 @@ const SYSFS_ETH_NET: &str = "/sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1
 
 const SIOCETHTOOL: u16 = 0x8946;
 
+const FIN_EEPROM_MAGIC: u32 = 0x9500;
 const FIN_EEPROM_OFFSET: u32 = 0x27;
 const FIN_EEPROM_LEN: usize = 21;
 
 const ETHTOOL_GEEPROM: u32 = 0x0000_000b;
+const ETHTOOL_SEEPROM: u32 = 0x0000_000c;
 
 type IfName = [u8; libc::IFNAMSIZ];
 
@@ -107,7 +109,37 @@ pub fn get_eeprom_revision() -> Option<String> {
     revision_from_eeprom_data(&data)
 }
 
-pub fn get_builtin_eth_interface() -> Option<String> {
+pub fn set_raw_eeprom(eeprom: &str) -> Option<()> {
+    let data = eeprom_data_from_str(eeprom)?;
+    let ctl_fd = create_control_socket()?;
+    let interface = get_builtin_eth_interface()?;
+    write_eeprom_data(&ctl_fd, &interface, data)?;
+    Some(())
+}
+
+pub fn get_raw_eeprom() -> Option<String> {
+    let ctl_fd = create_control_socket()?;
+    let interface = get_builtin_eth_interface()?;
+    let data = read_eeprom_data(&ctl_fd, &interface)?;
+    eeprom_data_to_string(&data)
+}
+
+fn eeprom_data_from_str(eeprom: &str) -> Option<EEPROMData> {
+    let data_slice = eeprom.as_bytes();
+    if data_slice.len() != FIN_EEPROM_LEN {
+        return None;
+    }
+    let mut data: EEPROMData = unsafe { ::std::mem::zeroed() };
+    data.clone_from_slice(data_slice);
+    parse_eeprom_data(&data)?;
+    Some(data)
+}
+
+fn eeprom_data_to_string(data: &EEPROMData) -> Option<String> {
+    String::from_utf8(data.to_vec()).ok()
+}
+
+fn get_builtin_eth_interface() -> Option<String> {
     let dir_iter = read_dir(SYSFS_ETH_NET).ok()?;
     let entry = dir_iter.last()?;
     let dir = entry.ok()?;
@@ -141,6 +173,24 @@ fn read_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str) -> Option<EEPROMData> 
     }
 
     Some(ereq.data)
+}
+
+fn write_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str, data: EEPROMData) -> Option<()> {
+    let mut req = ifreq::from_name(ifname)?;
+    let mut ereq = fin_ethtool_eeprom::default();
+
+    ereq.cmd = ETHTOOL_SEEPROM;
+    ereq.magic = FIN_EEPROM_MAGIC;
+    ereq.offset = FIN_EEPROM_OFFSET;
+    ereq.len = std::mem::size_of::<EEPROMData>() as u32;
+    ereq.data = data;
+    req.ifr_ifru.ifr_data = &mut ereq as *mut _ as *mut _;
+
+    if unsafe { ioctl_ethtool(ctl_fd.as_raw_fd(), &mut req) }.is_err() {
+        return None;
+    }
+
+    Some(())
 }
 
 fn revision_from_eeprom_data(data: &EEPROMData) -> Option<String> {
