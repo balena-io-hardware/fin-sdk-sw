@@ -8,7 +8,6 @@ RUST_SOURCES = \
 	fin-lib/src/ethtool.rs \
 	fin-lib/src/i2c.rs \
 	fin-lib/src/lib.rs \
-	fin-lib/src/eeprom.rs \
 	fin-sdk/src/lib.rs
 
 all: Fin-0.1.gir Fin-0.1.typelib

@@ -4,7 +4,7 @@ mod command;
 
 use command::{get_command, Command};
 
-use fin_lib::{get_revision, get_eeprom, set_eeprom};
+use fin_lib::{get_revision, get_eeprom, set_eeprom, get_uid};
 
 fn main() {
     match get_command() {
@@ -13,8 +13,15 @@ fn main() {
             if let Some(ref eeprom) = data {
                 set_eeprom(eeprom);
             } else {
-                println!("{}", get_eeprom())
+                if let Some(eeprom) = get_eeprom() {
+                    println!("{}", eeprom);
+                }
             }
-        }
+        },
+        Command::Uid => {
+            if let Some(uid) = get_uid() {
+                println!("{}", uid);
+            }
+        },
     }
 }

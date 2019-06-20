@@ -1,9 +1,11 @@
 use std::fs::{read_dir, File};
 use std::os::unix::io::{AsRawFd, FromRawFd};
 
+use libc;
+
 use nix::sys::socket::{socket, AddressFamily, SockFlag, SockType};
 
-use libc;
+use crate::i2c::probe_i2c_pca9633;
 
 const SYSFS_ETH_NET: &str = "/sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.1/1-1.1:1.0/net";
 
@@ -27,8 +29,8 @@ struct FinEEPROM {
     schema: u8,
     revision: String,
     serial: String,
-    week: u8,
-    year: u8,
+    week: String,
+    year: String,
     lot: String,
 }
 
@@ -102,26 +104,48 @@ impl Default for fin_ethtool_eeprom {
     }
 }
 
-pub fn get_eeprom_revision() -> Option<String> {
-    let ctl_fd = create_control_socket()?;
-    let interface = get_builtin_eth_interface()?;
-    let data = read_eeprom_data(&ctl_fd, &interface)?;
-    revision_from_eeprom_data(&data)
+pub fn get_revision() -> String {
+    if let Some(eeprom_revision) = get_eeprom_revision() {
+        eeprom_revision
+    } else if probe_i2c_pca9633().is_some() {
+        "10".to_string()
+    } else {
+        "09".to_string()
+    }
 }
 
-pub fn set_raw_eeprom(eeprom: &str) -> Option<()> {
+fn get_eeprom_revision() -> Option<String> {
+    let data = get_eeprom_data()?;
+    let parsed = parse_eeprom_data(&data)?;
+    Some(parsed.revision)
+}
+
+pub fn get_uid() -> Option<String> {
+    let data = get_eeprom_data()?;
+    let parsed = parse_eeprom_data(&data)?;
+    Some(format!("{}{}{}", parsed.serial, parsed.week, parsed.year))
+}
+
+pub fn set_eeprom(eeprom: &str) -> Option<()> {
     let data = eeprom_data_from_str(eeprom)?;
-    let ctl_fd = create_control_socket()?;
-    let interface = get_builtin_eth_interface()?;
-    write_eeprom_data(&ctl_fd, &interface, data)?;
-    Some(())
+    set_eeprom_data(data)
 }
 
-pub fn get_raw_eeprom() -> Option<String> {
+pub fn get_eeprom() -> Option<String> {
+    let data = get_eeprom_data()?;
+    eeprom_data_to_string(&data)
+}
+
+fn get_eeprom_data() -> Option<EEPROMData> {
     let ctl_fd = create_control_socket()?;
     let interface = get_builtin_eth_interface()?;
-    let data = read_eeprom_data(&ctl_fd, &interface)?;
-    eeprom_data_to_string(&data)
+    read_eeprom_data(&ctl_fd, &interface)
+}
+
+fn set_eeprom_data(data: EEPROMData) -> Option<()> {
+    let ctl_fd = create_control_socket()?;
+    let interface = get_builtin_eth_interface()?;
+    write_eeprom_data(&ctl_fd, &interface, data)
 }
 
 fn eeprom_data_from_str(eeprom: &str) -> Option<EEPROMData> {
@@ -193,11 +217,6 @@ fn write_eeprom_data<F: AsRawFd>(ctl_fd: &F, ifname: &str, data: EEPROMData) -> 
     Some(())
 }
 
-fn revision_from_eeprom_data(data: &EEPROMData) -> Option<String> {
-    let data = parse_eeprom_data(data)?;
-    Some(data.revision.to_string())
-}
-
 fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
     let data = String::from_utf8(data.to_vec()).ok()?;
 
@@ -210,20 +229,21 @@ fn parse_eeprom_data(data: &EEPROMData) -> Option<FinEEPROM> {
     if revision_u16 < 10 {
         return None;
     }
-
     let revision: String = data[1..3].to_string();
 
     let serial: String = data[3..8].to_string();
 
-    let week: u8 = data[8..10].parse().ok()?;
-    if week < 1 || week > 52 {
+    let week_u8: u8 = data[8..10].parse().ok()?;
+    if week_u8 < 1 || week_u8 > 52 {
         return None;
     }
+    let week: String = data[8..10].to_string();
 
-    let year: u8 = data[10..12].parse().ok()?;
-    if year < 17 {
+    let year_u8: u8 = data[10..12].parse().ok()?;
+    if year_u8 < 17 {
         return None;
     }
+    let year: String = data[10..12].to_string();
 
     let lot: String = data[12..21].to_string();
     if lot.chars().nth(4)? != '-' {

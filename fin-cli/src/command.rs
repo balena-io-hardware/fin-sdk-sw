@@ -3,6 +3,7 @@ use clap::{App, AppSettings, Arg, SubCommand};
 pub enum Command {
     Revision,
     Eeprom(Option<String>),
+    Uid,
 }
 
 pub fn get_command() -> Command {
@@ -23,6 +24,7 @@ pub fn get_command() -> Command {
                         .hidden(true),
                 ),
         )
+        .subcommand(SubCommand::with_name("uid").about("Prints board's unique ID"))
         .get_matches();
 
     match matches.subcommand() {
@@ -30,6 +32,7 @@ pub fn get_command() -> Command {
         ("eeprom", Some(eeprom_matches)) => {
             Command::Eeprom(eeprom_matches.value_of("set").map(String::from))
         }
+        ("uid", _) => Command::Uid,
         _ => unreachable!(),
     }
 }

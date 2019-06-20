@@ -3,8 +3,7 @@ extern crate nix;
 
 extern crate libc;
 
-mod eeprom;
 mod ethtool;
 mod i2c;
 
-pub use eeprom::{get_revision, get_eeprom, set_eeprom};
+pub use ethtool::{get_revision, get_eeprom, set_eeprom, get_uid};
