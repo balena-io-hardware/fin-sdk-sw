@@ -1,0 +1,9 @@
+{
+    "version": "0.0.1",
+    "name": "fin-sdk-revision",
+    "bin": "revision.js",
+    "dependencies": {
+        "node-gtk": "^0.3.0",
+        "sleep": "^6.1.0"
+    }
+}
