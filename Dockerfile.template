@@ -1,17 +1,6 @@
-################################################################################
-# Base image
-################################################################################
-
-FROM balenalib/%%BALENA_MACHINE_NAME%%-debian as base
-
-ENV INITSYSTEM=on
-ENV DEBIAN_FRONTEND=noninteractive
-
-FROM base as rust
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian:stretch
 
 RUN install_packages build-essential curl file libglib2.0-dev gobject-introspection libgirepository1.0-dev python3-gi
-
-RUN c_rehash
 
 ENV PATH=/root/.cargo/bin:$PATH
 
@@ -22,5 +11,9 @@ WORKDIR /app
 COPY . .
 
 RUN make
+
+RUN strip target/release/fin
+
+RUN strip target/release/libfin.so
 
 CMD ["sleep", "infinity"]
