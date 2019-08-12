@@ -29,6 +29,10 @@ FinClient *fin_client_new();
 
 const gchar *fin_client_get_revision(FinClient *client);
 
+const gchar *fin_client_get_eeprom(FinClient *client);
+
+const gchar *fin_client_get_uid(FinClient *client);
+
 G_END_DECLS
 
 #endif /* __FIN_CLIENT_H__ */

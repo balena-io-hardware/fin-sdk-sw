@@ -1,5 +1,31 @@
 # balenaFin SDK
 
+Multi-language SDK for the [balenaFin professional carrier board](https://www.balena.io/fin/) for the Raspberry Pi Compute Module.
+
+[**Python**](#python) | [**JavaScript**](#javascript) | [**API**](#api) | [**License**](#license)
+
+## Python
+
+For installation and usage under balenaOS please refer to the [Python example application](./examples/py/properties).
+
+## JavaScript
+
+For installation and usage under balenaOS please refer to the [JavaScript example application](./examples/js/properties).
+
+## API
+
+**Fin.Client.revision**
+
+balenaFin hardware revision. For balenaFin v1.0 boards the result will be `09` and for v1.0 boards it will be `10`, which corresponds to the revision number on the board's QR code.
+
+**Fin.Client.eeprom***
+
+balenaFin raw EEPROM data.
+
+**Fin.Client.uid**
+
+Board's unique ID.
+
 ## License
 
 Copyright 2019 Balena Ltd.

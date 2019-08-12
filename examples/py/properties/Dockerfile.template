@@ -1,0 +1,17 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian
+
+RUN install_packages python3-gi gir1.2-glib-2.0
+
+WORKDIR /tmp
+
+RUN curl -Ls https://github.com/balena-io/balena-fin-sdk/releases/download/v0.2.0/balena-fin-sdk-v0.2.0.tar.gz | tar -xvz -C .
+
+RUN mv Fin-0.2.typelib /usr/lib/arm-linux-gnueabihf/girepository-1.0/
+
+RUN mv libfin.so /usr/lib/arm-linux-gnueabihf/
+
+WORKDIR /app
+
+COPY ./properties.py .
+
+CMD ["python3", "properties.py"]
