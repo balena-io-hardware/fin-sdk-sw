@@ -13,20 +13,42 @@ use glib::subclass::prelude::*;
 use glib::translate::*;
 use glib::ToValue;
 
-use fin_lib::get_revision;
+use fin_lib::{get_revision, get_eeprom, get_uid};
 
-static PROPERTIES: [subclass::Property; 1] = [subclass::Property("revision", |revision| {
-    glib::ParamSpec::string(
-        revision,
-        "Revision",
-        "Revision",
-        None,
-        glib::ParamFlags::READABLE,
-    )
-})];
+static PROPERTIES: [subclass::Property; 3] = [
+    subclass::Property("revision", |revision| {
+        glib::ParamSpec::string(
+            revision,
+            "Revision",
+            "Revision",
+            None,
+            glib::ParamFlags::READABLE,
+        )
+    }),
+    subclass::Property("eeprom", |eeprom| {
+        glib::ParamSpec::string(
+            eeprom,
+            "Eeprom",
+            "Eeprom",
+            None,
+            glib::ParamFlags::READABLE,
+        )
+    }),
+    subclass::Property("uid", |uid| {
+        glib::ParamSpec::string(
+            uid,
+            "Uid",
+            "Uid",
+            None,
+            glib::ParamFlags::READABLE,
+        )
+    }),
+];
 
 pub struct RustClient {
     revision: CString,
+    eeprom: CString,
+    uid: CString,
 }
 
 type FinClientInstance = subclass::simple::InstanceStruct<RustClient>;
@@ -49,6 +71,16 @@ impl ObjectSubclass for RustClient {
     fn new() -> Self {
         Self {
             revision: CString::new(&get_revision() as &str).unwrap(),
+            eeprom: if let Some(eeprom) = get_eeprom() {
+                CString::new(&eeprom as &str)
+            } else {
+                CString::new("")
+            }.unwrap(),
+            uid: if let Some(uid) = get_uid() {
+                CString::new(&uid as &str)
+            } else {
+                CString::new("")
+            }.unwrap(),
         }
     }
 }
@@ -60,9 +92,9 @@ impl ObjectImpl for RustClient {
         let prop = &PROPERTIES[id];
 
         match *prop {
-            subclass::Property("revision", ..) => {
-                Ok(self.revision.clone().into_string().unwrap().to_value())
-            }
+            subclass::Property("revision", ..) => Ok(self.revision.clone().into_string().unwrap().to_value()),
+            subclass::Property("eeprom", ..) => Ok(self.eeprom.clone().into_string().unwrap().to_value()),
+            subclass::Property("uid", ..) => Ok(self.uid.clone().into_string().unwrap().to_value()),
             _ => unimplemented!(),
         }
     }
@@ -75,6 +107,14 @@ impl ObjectImpl for RustClient {
 impl RustClient {
     fn get_revision(&self) -> *const c_char {
         self.revision.as_ptr()
+    }
+
+    fn get_eeprom(&self) -> *const c_char {
+        self.eeprom.as_ptr()
+    }
+
+    fn get_uid(&self) -> *const c_char {
+        self.uid.as_ptr()
     }
 }
 
@@ -116,4 +156,14 @@ unsafe extern "C" fn fin_client_get_type() -> glib_sys::GType {
 #[no_mangle]
 unsafe extern "C" fn fin_client_get_revision(this: *const FinClient) -> *const c_char {
     into_rust_client(this).get_revision()
+}
+
+#[no_mangle]
+unsafe extern "C" fn fin_client_get_eeprom(this: *const FinClient) -> *const c_char {
+    into_rust_client(this).get_eeprom()
+}
+
+#[no_mangle]
+unsafe extern "C" fn fin_client_get_uid(this: *const FinClient) -> *const c_char {
+    into_rust_client(this).get_uid()
 }

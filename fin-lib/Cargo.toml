@@ -1,6 +1,6 @@
 [package]
 name = "fin-lib"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Zahari Petkov <zahari@balena.io>"]
 description = "balenaFin base library"
 license = "Apache-2.0"

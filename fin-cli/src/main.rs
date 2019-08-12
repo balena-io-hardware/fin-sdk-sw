@@ -11,7 +11,9 @@ fn main() {
         Command::Revision => println!("{}", get_revision()),
         Command::Eeprom(data) => {
             if let Some(ref eeprom) = data {
-                set_eeprom(eeprom);
+                if let None = set_eeprom(eeprom) {
+                    println!("Incorrect EEPROM value");
+                }
             } else {
                 if let Some(eeprom) = get_eeprom() {
                     println!("{}", eeprom);
