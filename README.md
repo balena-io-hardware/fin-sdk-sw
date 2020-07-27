@@ -16,7 +16,12 @@ For installation and usage under balenaOS please refer to the [JavaScript exampl
 
 **Fin.Client.revision**
 
-balenaFin hardware revision. For balenaFin v1.0 boards the result will be `09` and for v1.0 boards it will be `10`, which corresponds to the revision number on the board's QR code.
+balenaFin hardware revision in integer encoding form. 
+
+| Hardware revision | Integer encoding |
+|-------------------|------------------|
+| v1.0.0            | 09               |
+| v1.1.0            | 10               |
 
 **Fin.Client.eeprom***
 
