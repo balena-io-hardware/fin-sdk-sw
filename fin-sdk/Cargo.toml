@@ -10,7 +10,7 @@ edition = "2018"
 fin-lib = { version = "*", path = "../fin-lib" }
 glib-sys = { git = "https://github.com/gtk-rs/sys" }
 gobject-sys = { git = "https://github.com/gtk-rs/sys" }
-glib = { git = "https://github.com/gtk-rs/glib", features = ["subclassing"] }
+glib = { git = "https://github.com/gtk-rs/glib" }
 
 [lib]
 crate-type = ["cdylib"]
