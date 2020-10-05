@@ -6,4 +6,4 @@ extern crate libc;
 mod ethtool;
 mod i2c;
 
-pub use ethtool::{get_revision, get_eeprom, set_eeprom, get_uid};
+pub use ethtool::{get_eeprom, get_revision, get_uid, set_eeprom};
