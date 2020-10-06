@@ -1,8 +1,6 @@
 use std::fs::{read_dir, File};
 use std::os::unix::io::{AsRawFd, FromRawFd};
 
-use libc;
-
 use nix::sys::socket::{socket, AddressFamily, SockFlag, SockType};
 
 use crate::i2c::probe_i2c_pca9633;

@@ -11,13 +11,11 @@ fn main() {
         Command::Revision => println!("{}", get_revision()),
         Command::Eeprom(data) => {
             if let Some(ref eeprom) = data {
-                if let None = set_eeprom(eeprom) {
+                if set_eeprom(eeprom).is_none() {
                     println!("Incorrect EEPROM value");
                 }
-            } else {
-                if let Some(eeprom) = get_eeprom() {
-                    println!("{}", eeprom);
-                }
+            } else if let Some(eeprom) = get_eeprom() {
+                println!("{}", eeprom);
             }
         }
         Command::Uid => {
