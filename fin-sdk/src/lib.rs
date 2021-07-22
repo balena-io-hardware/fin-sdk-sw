@@ -13,7 +13,7 @@ use glib::subclass::prelude::*;
 use glib::translate::*;
 use glib::ToValue;
 
-use fin_lib::{get_revision, get_eeprom, get_uid};
+use fin_lib::{get_eeprom, get_revision, get_uid};
 
 static PROPERTIES: [subclass::Property; 3] = [
     subclass::Property("revision", |revision| {
@@ -26,22 +26,10 @@ static PROPERTIES: [subclass::Property; 3] = [
         )
     }),
     subclass::Property("eeprom", |eeprom| {
-        glib::ParamSpec::string(
-            eeprom,
-            "Eeprom",
-            "Eeprom",
-            None,
-            glib::ParamFlags::READABLE,
-        )
+        glib::ParamSpec::string(eeprom, "Eeprom", "Eeprom", None, glib::ParamFlags::READABLE)
     }),
     subclass::Property("uid", |uid| {
-        glib::ParamSpec::string(
-            uid,
-            "Uid",
-            "Uid",
-            None,
-            glib::ParamFlags::READABLE,
-        )
+        glib::ParamSpec::string(uid, "Uid", "Uid", None, glib::ParamFlags::READABLE)
     }),
 ];
 
@@ -75,12 +63,14 @@ impl ObjectSubclass for RustClient {
                 CString::new(&eeprom as &str)
             } else {
                 CString::new("")
-            }.unwrap(),
+            }
+            .unwrap(),
             uid: if let Some(uid) = get_uid() {
                 CString::new(&uid as &str)
             } else {
                 CString::new("")
-            }.unwrap(),
+            }
+            .unwrap(),
         }
     }
 }
@@ -92,8 +82,12 @@ impl ObjectImpl for RustClient {
         let prop = &PROPERTIES[id];
 
         match *prop {
-            subclass::Property("revision", ..) => Ok(self.revision.clone().into_string().unwrap().to_value()),
-            subclass::Property("eeprom", ..) => Ok(self.eeprom.clone().into_string().unwrap().to_value()),
+            subclass::Property("revision", ..) => {
+                Ok(self.revision.clone().into_string().unwrap().to_value())
+            }
+            subclass::Property("eeprom", ..) => {
+                Ok(self.eeprom.clone().into_string().unwrap().to_value())
+            }
             subclass::Property("uid", ..) => Ok(self.uid.clone().into_string().unwrap().to_value()),
             _ => unimplemented!(),
         }

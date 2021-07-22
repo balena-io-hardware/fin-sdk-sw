@@ -16,15 +16,21 @@ For installation and usage under balenaOS please refer to the [JavaScript exampl
 
 **Fin.Client.revision**
 
-balenaFin hardware revision. For balenaFin v1.0 boards the result will be `09` and for v1.0 boards it will be `10`, which corresponds to the revision number on the board's QR code.
+balenaFin hardware revision in integer encoding form. 
+
+| Hardware revision | Integer encoding |
+|-------------------|------------------|
+| v1.0.0            | 09               |
+| v1.1.0            | 10               |
+| v1.1.1            | 11               |
 
 **Fin.Client.eeprom***
 
-balenaFin raw EEPROM data.
+balenaFin raw EEPROM data. This data is the byte-encoded version of the device serial identifier found on the QRcode on the top side of the PCB of the board. This data is available in this SW form starting from v1.1.1
 
 **Fin.Client.uid**
 
-Board's unique ID.
+Board's serial identifier. This data is the string encoded version of the device serial identifier - exact same value you would scan from the QRcode on the top side of the PCB of the board. This data is available in this SW form starting from v1.1.1
 
 ## License
 

@@ -8,9 +8,9 @@ edition = "2018"
 
 [dependencies]
 fin-lib = { version = "*", path = "../fin-lib" }
-glib-sys = { git = "https://github.com/gtk-rs/sys" }
-gobject-sys = { git = "https://github.com/gtk-rs/sys" }
-glib = { git = "https://github.com/gtk-rs/glib", features = ["subclassing"] }
+glib-sys = "0.10"
+gobject-sys = "0.10"
+glib = "0.10"
 
 [lib]
 crate-type = ["cdylib"]
