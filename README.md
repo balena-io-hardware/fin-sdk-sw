@@ -1,3 +1,9 @@
+
+# balenaFin SDK is being deprecated in favour of the [Fin Block](https://github.com/balenablocks/fin)
+
+We are moving to a balenaBlock based solution for accessing the same functionality found in the balenaFin SDK.
+Please see the [Fin Block](https://github.com/balenablocks/fin) repo for the latest information.
+
 # balenaFin SDK
 
 Multi-language SDK for the [balenaFin professional carrier board](https://www.balena.io/fin/) for the Raspberry Pi Compute Module.
